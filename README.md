@@ -6,6 +6,7 @@ Bu depo, Mobil Programlama I dersinin resmi **"Çevik (Agile) Operasyon Merkezi"
 
 > **📌 Kısa Özet:** Fork'la → Kendi kopyanda çalış → PR aç → Denetimden geç → Merge. Detaylar aşağıda.
 
+Çeviri yaptığınız .md dosyasının en üstüne mutlaka tıklanabilir bir "İçindekiler (Table of Contents)" menüsü ekleyiniz. Bölüm başlıklarında # ve ## hiyerarşisini doğru kullanın ki, GitHub sol taraftaki otomatik navigasyon menüsünü düzgün çizebilsin.
 ---
 
 ## 📂 Depo Yapısı
@@ -17,7 +18,7 @@ mobil-programlama1/
 │
 ├── README.md                             ← bu dosya
 │
-├── dart-language-modules/                ← BÖLÜM 1: DART
+├── dart-language/                ← BÖLÜM 1: DART
 │   ├── 01-dart-anatomy/                  ← KONU
 │   │   ├── ceviri/
 │   │   │   ├── 2026-guz-kodbucuk.md
