@@ -1,4 +1,0 @@
-# Ekran görüntüsü üreten uçtan uca arayüz testleri (test/ui).
-# Görüntüler yalnızca `--update-goldens` ile üretilir.
-tags:
-  golden:
