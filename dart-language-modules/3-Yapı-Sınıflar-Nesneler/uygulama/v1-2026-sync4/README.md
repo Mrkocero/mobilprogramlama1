@@ -467,4 +467,3 @@ Bu proje açık kaynaklı olup akademik ve kurumsal kullanıma uygundur.
 - Kurumsal Logolar: Sivas Cumhuriyet Üniversitesi Kurumsal Kimlik kılavuzuna aittir.
 
 Katkıda bulunmak için lütfen bir **Issue** açın veya doğrudan **Pull Request** gönderin. Herhangi bir sorunuzda Şarkışla Uygulamalı Bilimler Yüksekokulu Bilişim Sistemleri ve Teknolojileri Bölümü ile iletişime geçebilirsiniz.
-

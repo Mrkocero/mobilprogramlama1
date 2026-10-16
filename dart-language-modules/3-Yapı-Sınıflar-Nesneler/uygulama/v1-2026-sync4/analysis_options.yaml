@@ -1,0 +1,28 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "lib/l10n/generated/**"
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+  language:
+    strict-casts: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # Genel API'ler `///` ile belgeleniyor; arayüz widget'larının her
+    # parametresinin belgelenmesi zorunlu tutulmuyor.
+    public_member_api_docs: false
+    # Proje, Dart dokümantasyonundaki "Classes & objects" bölümünü göstermeyi
+    # amaçlıyor. Bu yüzden constructor'lar klasik `SinifAdi(...)` /
+    # `const SinifAdi.isim(...)` yazımıyla bırakıldı; yeni kısa yazım
+    # önerileri kapatıldı.
+    unnecessary_type_name_in_constructor: false
+    unnecessary_const_in_enum_constructor: false
