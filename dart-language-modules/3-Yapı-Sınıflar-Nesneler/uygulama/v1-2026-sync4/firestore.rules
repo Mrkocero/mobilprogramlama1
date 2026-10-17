@@ -1,0 +1,73 @@
+rules_version = '2';
+
+// Şarkışla Yoklama — Firestore güvenlik kuralları
+// Uygulamadaki kuralların sunucu tarafı karşılığı:
+//  * Zincir yalnızca eklenebilir (append-only): bloklar güncellenemez/silinemez.
+//  * Yalnızca öğretim görevlileri blok ekler ve oturum açar/kapatır.
+//  * Öğrenci yalnızca kendi adına, oturum başına bir kez yoklama verir.
+//  * Yoklama yalnızca ekrandaki son iki QR'ın nonce'u ile kabul edilir.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isInstructor() { return signedIn() && me().role == 'instructor'; }
+    function isStudent() { return signedIn() && me().role == 'student'; }
+
+    // Kullanıcı profilleri: herkes kendi profilini okur; öğrenci yalnızca
+    // boş olan cihaz eşleşmesini bir kez doldurabilir.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow update: if request.auth.uid == uid
+        && resource.data.boundDeviceId == null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['boundDeviceId']);
+      allow create, delete: if false; // yönetici paneli / Admin SDK
+    }
+
+    // Yetkili açık anahtarları: görevli kendi anahtarını yalnızca bir kez yazar.
+    match /authorities/{uid} {
+      allow read: if signedIn();
+      allow create: if isInstructor() && request.auth.uid == uid;
+      allow update, delete: if false;
+    }
+
+    match /courses/{courseId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // Zincir: meta belge + bloklar (append-only).
+    match /chain/meta {
+      allow read: if signedIn();
+      allow write: if isInstructor()
+        && request.resource.data.length == (resource == null ? 1 : resource.data.length) + 1;
+
+      match /blocks/{blockId} {
+        allow read: if signedIn();
+        allow create: if isInstructor()
+          && request.resource.data.authority == request.auth.uid
+          && !exists(/databases/$(database)/documents/chain/meta/blocks/$(blockId));
+        allow update, delete: if false;
+      }
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if signedIn();
+      allow create: if isInstructor() && request.resource.data.instructorId == request.auth.uid;
+      allow update: if isInstructor() && resource.data.instructorId == request.auth.uid;
+      allow delete: if false;
+
+      // Belge kimliği = öğrenci uid'i → oturum başına tek yoklama.
+      match /checkins/{studentUid} {
+        allow read: if signedIn();
+        allow create: if isStudent()
+          && request.auth.uid == studentUid
+          && request.resource.data.record.studentId == studentUid
+          && get(/databases/$(database)/documents/sessions/$(sessionId)).data.endedAt == null
+          && request.resource.data.nonce in get(/databases/$(database)/documents/sessions/$(sessionId)).data.activeNonces
+          && !exists(/databases/$(database)/documents/sessions/$(sessionId)/checkins/$(studentUid));
+        allow update, delete: if false;
+      }
+    }
+  }
+}
